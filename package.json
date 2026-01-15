@@ -13,7 +13,7 @@
     "@workspace/typescript-config": "workspace:*",
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
-    "turbo": "catalog:",
+    "turbo": "^2.7.4",
     "typescript": "catalog:"
   },
   "packageManager": "pnpm@10.28.0",
