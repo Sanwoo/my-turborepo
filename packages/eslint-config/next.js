@@ -1,12 +1,15 @@
-import js from "@eslint/js"
-import pluginNext from "@next/eslint-plugin-next"
-import eslintConfigPrettier from "eslint-config-prettier"
-import pluginReact from "eslint-plugin-react"
-import pluginReactHooks from "eslint-plugin-react-hooks"
-import globals from "globals"
-import tseslint from "typescript-eslint"
+import js from '@eslint/js'
+import { FlatCompat } from '@eslint/eslintrc'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import globals from 'globals'
+import pluginTailwindcss from 'eslint-plugin-tailwindcss'
+import tseslint from 'typescript-eslint'
 
-import { config as baseConfig } from "./base.js"
+import { config as baseConfig } from './base.js'
+
+const compat = new FlatCompat({
+  baseDirectory: import.meta.dirname,
+})
 
 /**
  * A custom ESLint configuration for libraries that use Next.js.
@@ -18,34 +21,31 @@ export const nextJsConfig = [
   js.configs.recommended,
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
+  ...compat.extends('next'),
   {
-    ...pluginReact.configs.flat.recommended,
     languageOptions: {
-      ...pluginReact.configs.flat.recommended.languageOptions,
       globals: {
         ...globals.serviceworker,
       },
     },
-  },
-  {
-    plugins: {
-      "@next/next": pluginNext,
-    },
+    settings: { react: { version: 'detect' } },
     rules: {
-      ...pluginNext.configs.recommended.rules,
-      ...pluginNext.configs["core-web-vitals"].rules,
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
     },
   },
   {
     plugins: {
-      "react-hooks": pluginReactHooks,
+      tailwindcss: pluginTailwindcss,
     },
-    settings: { react: { version: "detect" } },
+    settings: {
+      tailwindcss: {
+        config: './tailwind.config.ts',
+        cssFiles: ['**/*.css', '!**/node_modules/**', '!**/dist/**', '!**/build/**'],
+      },
+    },
     rules: {
-      ...pluginReactHooks.configs.recommended.rules,
-      // React scope no longer necessary with new JSX transform.
-      "react/react-in-jsx-scope": "off",
-      "react/prop-types": "off",
+      ...pluginTailwindcss.configs.recommended.rules,
     },
   },
 ]
