@@ -6,11 +6,17 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "catalog:",
+    "@commitlint/config-conventional": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "eslint": "catalog:",
+    "husky": "catalog:",
+    "lint-staged": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-tailwindcss": "catalog:",
     "turbo": "catalog:",
@@ -19,5 +25,48 @@
   "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=20"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{css,scss,md,json}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "type-enum": [
+        2,
+        "always",
+        [
+          "feat",
+          "fix",
+          "chore",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test"
+        ]
+      ],
+      "scope-empty": [
+        0
+      ],
+      "subject-case": [
+        2,
+        "always",
+        "lower-case"
+      ],
+      "header-max-length": [
+        2,
+        "always",
+        100
+      ]
+    }
   }
 }

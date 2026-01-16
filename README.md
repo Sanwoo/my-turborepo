@@ -32,20 +32,95 @@ import { Button } from '@workspace/ui/components/button'
 
 ## ESLint 配置
 
-项目使用 `eslint-config-next` 作为 Next.js 应用的 ESLint 配置，它已经包含了以下插件的推荐规则集：
+项目使用 **ESLint 9.x** 的 flat config 格式，所有配置都采用新的配置方式。
 
-- `@next/eslint-plugin-next` - Next.js 特定的 ESLint 规则
-- `eslint-plugin-react` - React 的推荐规则
-- `eslint-plugin-react-hooks` - React Hooks 的推荐规则
+### 配置架构
+
+项目采用分层 ESLint 配置架构：
+
+1. **共享配置包** (`packages/eslint-config/`):
+   - `base.js` - 基础配置，包含通用规则
+   - `next.js` - Next.js 应用配置
+   - `react-internal.js` - React 库配置
+
+2. **根目录配置** (`eslint.config.js`):
+   - 使用 flat config 格式（ES modules）
+   - 引用 `@workspace/eslint-config/base` 作为基础配置
+   - 仅应用于根目录文件，忽略 `apps/**` 和 `packages/**`
+
+3. **子包配置**:
+   - 每个子包（`apps/*` 和 `packages/*`）都有自己的 `eslint.config.js`
+   - 根据包的类型引用相应的共享配置
 
 ### 配置说明
 
-- Next.js 应用的 ESLint 配置位于 `packages/eslint-config/next.js`
-- 使用 `eslint-config-next` 替代了之前单独安装的三个插件，简化了配置管理
+#### 根目录配置
+
+**文件**: `eslint.config.mjs`（项目根目录）
+
+- 使用 **flat config 格式**（ESLint 9.x 新格式）
+- 使用 **ES modules** (`import/export`)
+- 引用 `@workspace/eslint-config/base` 作为基础配置
+- 支持 TypeScript 文件（`.ts`, `.js`）
+- 忽略子包目录：`apps/**`, `packages/**`
+
+**配置示例**:
+
+```javascript
+import { config as baseConfig } from '@workspace/eslint-config/base'
+
+export default [
+  ...baseConfig,
+  {
+    ignores: ['apps/**', 'packages/**', 'node_modules/**', '.next/**', 'dist/**', 'build/**', '.turbo/**'],
+  },
+]
+```
+
+**注意**: 使用 `.mjs` 扩展名明确指定为 ES module，避免需要在 `package.json` 中添加 `"type": "module"`。
+
+#### Next.js 应用配置
+
+**文件**: `packages/eslint-config/next.js`
+
+- 使用 `eslint-config-next` 作为 Next.js 应用的 ESLint 配置
+- 包含以下插件的推荐规则集：
+  - `@next/eslint-plugin-next` - Next.js 特定的 ESLint 规则
+  - `eslint-plugin-react` - React 的推荐规则
+  - `eslint-plugin-react-hooks` - React Hooks 的推荐规则
 - 配置通过 `@eslint/eslintrc` 的 `FlatCompat` 兼容层适配 ESLint 9.x 的 flat config 格式
 - 保留了必要的自定义规则，如 `react/react-in-jsx-scope: "off"` 和 `react/prop-types: "off"`
 
+### Tailwind CSS ESLint 支持
+
+项目已集成 `eslint-plugin-tailwindcss@^3.18.2`，用于检查 Tailwind CSS 类名的正确性和最佳实践。
+
+- **插件版本**: `3.18.2`（兼容 Tailwind CSS v3）
+- **配置位置**: `packages/eslint-config/next.js`
+- **功能**:
+  - 检查 Tailwind CSS 类名是否存在
+  - 验证类名顺序和格式
+  - 检测未使用的自定义类名
+  - 提供 Tailwind CSS 最佳实践建议
+
 ### 变更历史
+
+#### ESLint 9.x Flat Config 迁移
+
+- **迁移时间**: 2024年
+- **变更内容**:
+  - 将根目录的 `.eslintrc.js` 迁移到 `eslint.config.mjs`（flat config 格式）
+  - 使用 ES modules 替代 CommonJS（`.mjs` 扩展名明确指定为 ES module）
+  - 使用 flat config 数组格式替代旧的配置对象格式
+  - 使用 `ignores` 字段替代 `ignorePatterns`
+  - 引用 `@workspace/eslint-config/base` 作为基础配置
+- **迁移原因**:
+  - ESLint 9.x 默认使用 flat config 格式
+  - 更好的性能和配置灵活性
+  - 与 Turborepo monorepo 架构更兼容
+  - 统一配置管理，根目录配置与子包配置保持一致
+
+#### 历史变更
 
 - 移除了 `@next/eslint-plugin-next`、`eslint-plugin-react` 和 `eslint-plugin-react-hooks` 的单独依赖
 - 使用 `eslint-config-next` 统一管理 Next.js、React 和 React Hooks 的 ESLint 规则
@@ -188,6 +263,8 @@ pnpx add-skill vercel-labs/agent-skills
    - `eslint-config-next@^15.4.5`, `eslint-config-prettier@^9.1.2`
    - `eslint-plugin-only-warn@^1.1.0`, `eslint-plugin-tailwindcss@^3.18.2`, `eslint-plugin-turbo@^2.5.5`
    - `prettier-plugin-tailwindcss@^0.7.2`, `typescript-eslint@^8.39.0`
+   - `husky@^9.1.7`, `lint-staged@^16.2.7`
+   - `@commitlint/cli@^20.3.1`, `@commitlint/config-conventional@^20.3.1`
 
 3. **类型定义** (Type Definitions)
    - `@types/node@^20.19.25`, `@types/react@^19.2.7`, `@types/react-dom@^19.2.3`
@@ -247,6 +324,213 @@ pnpx add-skill vercel-labs/agent-skills
 - **版本一致性**: 确保所有子包使用相同版本的共享依赖
 - **简化管理**: 只需在一个地方更新版本，所有子包自动同步
 - **减少冲突**: 避免因版本不一致导致的构建或运行时问题
+
+## 代码质量与提交规范
+
+项目集成了 **Husky**、**lint-staged** 和 **commitlint**，用于在提交前自动检查代码质量和规范提交信息格式。
+
+### Husky
+
+**Husky** 用于管理 Git hooks，确保在提交代码前自动执行代码质量检查。
+
+#### 配置说明
+
+- **安装位置**: 项目根目录 `.husky/` 目录
+- **初始化**: 通过 `package.json` 中的 `prepare` 脚本自动初始化
+- **Hooks**:
+  - `pre-commit`: 在提交前运行 `lint-staged`，对暂存文件进行格式化和检查
+  - `commit-msg`: 在提交时验证 commit message 格式是否符合规范
+
+#### 工作原理
+
+1. 当执行 `git commit` 时，Husky 会自动触发 `pre-commit` hook
+2. `pre-commit` hook 执行 `lint-staged`，对暂存的文件进行格式化（Prettier）和检查（ESLint）
+3. 如果检查通过，继续执行 `commit-msg` hook 验证提交信息格式
+4. 如果任何检查失败，提交将被阻止
+
+### Lint-Staged
+
+**lint-staged** 用于只对 Git 暂存区（staged）的文件运行 linters，提高提交效率。
+
+#### 配置文件
+
+**文件位置**: `package.json` 中的 `lint-staged` 字段（项目根目录）
+
+**配置规则**:
+
+```json
+{
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": ["npx eslint --fix", "npx prettier --write"],
+    "**/*.{css,scss,md,json}": ["npx prettier --write"]
+  }
+}
+```
+
+**注意**: 使用 `npx` 来执行命令，确保能找到正确的可执行文件（eslint 和 prettier）。
+
+#### 处理流程
+
+- **TypeScript/JavaScript 文件** (`*.ts`, `*.tsx`, `*.js`, `*.jsx`):
+  - 运行 `eslint --fix` 自动修复可修复的问题
+  - 运行 `prettier --write` 格式化代码
+- **样式和文档文件** (`*.css`, `*.scss`, `*.md`, `*.json`):
+  - 运行 `prettier --write` 格式化代码
+
+#### 优势
+
+- **只处理变更文件**: 只对暂存的文件进行检查，提高效率
+- **自动修复**: ESLint 和 Prettier 会自动修复可修复的问题
+- **Monorepo 支持**: 自动匹配所有子包的文件，无需额外配置
+- **配置简化**: 配置直接集成在 `package.json` 中，无需单独的配置文件
+
+#### 配置说明
+
+根据 [lint-staged 官方文档](https://github.com/lint-staged/lint-staged?tab=readme-ov-file#configuration)，lint-staged 支持多种配置方式：
+
+- **package.json**: 在 `package.json` 中使用 `lint-staged` 字段（推荐，当前使用）
+- **独立配置文件**: `.lintstagedrc.js`、`.lintstagedrc.json` 等（已弃用）
+
+项目选择在 `package.json` 中配置，简化项目结构，减少配置文件数量。
+
+### Commitlint
+
+**commitlint** 用于验证 commit message 是否符合 **Conventional Commits** 规范。
+
+#### 配置文件
+
+**文件位置**: `package.json` 中的 `commitlint` 字段（项目根目录）
+
+**配置规则**:
+
+```json
+{
+  "commitlint": {
+    "extends": ["@commitlint/config-conventional"],
+    "rules": {
+      "type-enum": [2, "always", ["feat", "fix", "chore", "docs", "style", "refactor", "perf", "test"]],
+      "scope-empty": [0],
+      "subject-case": [2, "always", "lower-case"],
+      "header-max-length": [2, "always", 100]
+    }
+  }
+}
+```
+
+**配置说明**:
+
+- **基础配置**: 使用 `@commitlint/config-conventional` 作为基础配置
+- **类型枚举**: 支持以下提交类型：
+  - `feat`: 新功能
+  - `fix`: 修复 bug
+  - `chore`: 构建过程或辅助工具的变动
+  - `docs`: 文档变更
+  - `style`: 代码格式（不影响代码运行的变动）
+  - `refactor`: 重构（既不是新增功能，也不是修复 bug）
+  - `perf`: 性能优化
+  - `test`: 测试相关
+- **Scope**: 可选，允许为空
+- **Subject**: 必须小写
+- **Header 长度**: 最大 100 字符
+
+**注意**: 根据 [commitlint 官方文档](https://commitlint.js.org/reference/configuration.html#config-via-package-json)，commitlint 支持在 `package.json` 中使用 `commitlint` 字段配置，无需单独的配置文件。项目选择在 `package.json` 中配置，简化项目结构。
+
+#### 提交信息格式
+
+提交信息必须遵循以下格式：
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+**示例**:
+
+```bash
+feat(ui): add button component
+fix(web): resolve navigation issue
+chore: update dependencies
+docs: update README
+```
+
+#### 验证流程
+
+1. 当执行 `git commit` 时，Husky 的 `commit-msg` hook 会被触发
+2. `commit-msg` hook 执行 `commitlint --edit $1` 验证提交信息
+3. 如果提交信息不符合规范，提交将被阻止并显示错误信息
+4. 修改提交信息后重新提交即可
+
+### Turborepo 集成
+
+项目中的代码质量工具与 Turborepo 完美集成：
+
+- **统一配置**: 所有配置都在根目录，适用于整个 monorepo
+- **缓存支持**: Turborepo 可以缓存 lint 和 format 任务的结果
+- **并行执行**: 在 CI/CD 环境中，Turborepo 可以并行执行多个包的检查任务
+
+#### 相关脚本
+
+在根 `package.json` 中：
+
+```json
+{
+  "scripts": {
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install"
+  }
+}
+```
+
+- `pnpm lint`: 使用 Turborepo 并行执行所有子包的 lint 任务
+- `pnpm format`: 格式化所有文件
+- `prepare`: 在安装依赖后自动初始化 Husky
+
+### 使用示例
+
+#### 正常提交流程
+
+```bash
+# 1. 修改文件
+git add .
+
+# 2. 提交（会自动触发 pre-commit 和 commit-msg hooks）
+git commit -m "feat(ui): add new component"
+
+# 如果代码有格式问题，lint-staged 会自动修复并重新暂存
+# 如果提交信息格式不正确，commitlint 会阻止提交
+```
+
+#### 跳过 Hooks（不推荐）
+
+如果确实需要跳过 hooks（例如在 CI 环境中），可以使用：
+
+```bash
+git commit --no-verify -m "message"
+```
+
+**注意**: 仅在特殊情况下使用，正常情况下应遵循代码质量检查。
+
+### 依赖版本
+
+项目使用以下版本的工具：
+
+- **husky**: `^9.1.7` - Git hooks 管理工具
+- **lint-staged**: `^16.2.7` - 暂存文件检查工具
+- **@commitlint/cli**: `^20.3.1` - Commitlint 命令行工具
+- **@commitlint/config-conventional**: `^20.3.1` - Conventional Commits 规范配置
+
+所有依赖都通过 pnpm catalog 统一管理，确保版本一致性。
+
+### 注意事项
+
+1. **首次使用**: 克隆项目后，运行 `pnpm install` 会自动执行 `prepare` 脚本初始化 Husky
+2. **权限问题**: 如果 hooks 无法执行，确保 `.husky/` 目录下的文件具有可执行权限
+3. **性能优化**: lint-staged 只处理暂存文件，不会影响整个项目的检查性能
+4. **团队协作**: 所有团队成员都应遵循相同的提交规范，确保项目历史记录的一致性
 
 ## Tailwind CSS 降级说明
 
