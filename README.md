@@ -71,6 +71,7 @@ import { Button } from '@workspace/ui/components/button'
 **配置文件**: `.prettierrc.json`（项目根目录）
 
 **格式化规则**:
+
 - `printWidth: 200` - 每行最大字符数为 200
 - `semi: false` - 不使用分号
 - `singleQuote: true` - 使用单引号
@@ -85,16 +86,19 @@ import { Button } from '@workspace/ui/components/button'
 ### 使用方式
 
 **格式化所有文件**:
+
 ```bash
 pnpm format
 ```
 
 **格式化特定文件**:
+
 ```bash
 pnpm prettier --write "path/to/file"
 ```
 
 **检查格式**:
+
 ```bash
 pnpm prettier --check "**/*.{ts,tsx,md}"
 ```
@@ -102,9 +106,61 @@ pnpm prettier --check "**/*.{ts,tsx,md}"
 ### 编辑器集成
 
 项目配置与 VS Code/Cursor 的 Prettier 扩展兼容，支持：
+
 - 保存时自动格式化（`editor.formatOnSave: true`）
 - 使用项目级别的 Prettier 配置
 - 自动应用 Tailwind CSS 类名排序
+
+## Agent Skills 配置
+
+项目已配置项目级别的 Agent Skills，用于提升 AI 辅助开发的代码质量和最佳实践。
+
+### 已安装的 Skills
+
+项目在 `.cursor/skills/` 和 `.agent/skills/` 目录下安装了以下 skills：
+
+1. **vercel-react-best-practices**
+   - **描述**: React 和 Next.js 性能优化指南，来自 Vercel Engineering
+   - **用途**: 在编写、审查或重构 React/Next.js 代码时确保最佳性能模式
+   - **触发场景**:
+     - 编写新的 React 组件或 Next.js 页面
+     - 实现数据获取（客户端或服务端）
+     - 审查代码性能问题
+     - 重构现有 React/Next.js 代码
+   - **包含**: 45 条规则，涵盖 8 个类别
+
+2. **web-design-guidelines**
+   - **描述**: Web 界面指南，用于审查 UI 代码合规性
+   - **用途**: 审查代码是否符合 Web 界面指南
+   - **触发场景**:
+     - 审查 UI 代码
+     - 检查可访问性
+     - 审计设计
+     - 审查 UX
+     - 检查网站是否符合最佳实践
+
+### 安装位置
+
+- **Cursor**: `.cursor/skills/`
+- **Antigravity**: `.agent/skills/`
+
+### 使用说明
+
+这些 skills 会在以下场景自动触发：
+
+- 当 AI 助手处理 React/Next.js 相关代码时，会自动应用性能优化最佳实践
+- 当审查 UI 代码或进行设计审计时，会自动检查是否符合 Web 界面指南
+- 在代码生成和重构过程中，会自动遵循这些最佳实践
+
+### 管理 Skills
+
+如需添加或更新 skills，可以使用：
+
+```bash
+pnpx add-skill vercel-labs/agent-skills
+```
+
+选择项目级别（Project）安装，skills 将安装到项目的 `.cursor/skills/` 和 `.agent/skills/` 目录。
 
 ## 依赖管理
 
@@ -143,7 +199,7 @@ pnpm prettier --check "**/*.{ts,tsx,md}"
    - `tailwindcss@^3.4.17`, `autoprefixer@^10.4.20`, `tailwind-merge@^3.3.1`
 
 6. **构建工具** (Build Tools)
-   - `turbo@^2.6.3`, `@turbo/gen@^2.5.5`, `prettier@^3.7.4`
+   - `turbo@^2.7.4`, `@turbo/gen@^2.5.5`, `prettier@^3.7.4`
 
 7. **工具库** (Utility Libraries)
    - `zod@^3.25.76`, `class-variance-authority@^0.7.1`, `clsx@^2.1.1`
@@ -173,6 +229,7 @@ pnpm prettier --check "**/*.{ts,tsx,md}"
 
 - **Next.js**: 已更新到 `v16.1.1`（最新版本）
 - **Tailwind CSS**: 已从 `v4.x` 降级到 `v3.4.17`（更好的兼容性）
+- **Turbo**: 已从 `v2.6.3` 升级到 `v2.7.4`（使用 `@turbo/codemod` 自动升级，无需 codemod 迁移）
 
 ### 添加新的依赖
 
@@ -422,4 +479,5 @@ const config: Config = {
 - [Tailwind CSS v3 文档](https://tailwindcss.com/docs)
 - [Tailwind CSS v3 配置指南](https://tailwindcss.com/docs/configuration)
 - [从 v4 迁移到 v3](https://tailwindcss.com/docs/upgrade-guide)
+
 # my-turborepo

@@ -39,7 +39,7 @@ catalog:
   'tailwind-merge': ^3.3.1
 
   # 构建工具 (Build Tools)
-  turbo: ^2.6.3
+  turbo: ^2.7.4
   '@turbo/gen': ^2.5.5
   prettier: ^3.7.4
 
