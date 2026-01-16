@@ -16,6 +16,14 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "clean": {
+      "cache": false,
+      "dependsOn": []
+    },
+    "deep-clean": {
+      "cache": false,
+      "dependsOn": []
     }
   }
 }

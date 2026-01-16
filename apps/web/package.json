@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "typecheck": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf .turbo .next dist"
   },
   "dependencies": {
     "@workspace/ui": "workspace:*",

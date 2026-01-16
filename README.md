@@ -325,6 +325,332 @@ pnpx add-skill vercel-labs/agent-skills
 - **简化管理**: 只需在一个地方更新版本，所有子包自动同步
 - **减少冲突**: 避免因版本不一致导致的构建或运行时问题
 
+## 项目架构
+
+项目采用 **Turborepo** monorepo 架构，按照功能层次组织包结构，确保依赖关系清晰、构建流程高效。
+
+### 架构层次
+
+项目采用三层架构设计：
+
+```
+Level 0 (基础层 - 配置包):
+  ├── @workspace/eslint-config      # ESLint 共享配置
+  └── @workspace/typescript-config  # TypeScript 共享配置
+
+Level 1 (共享层 - 共享包):
+  └── @workspace/ui                 # UI 组件库
+
+Level 2 (应用层 - 应用):
+  └── web                           # Next.js 应用
+```
+
+### 包类型说明
+
+#### 1. 配置包 (Config Packages)
+
+**位置**: `packages/eslint-config/`, `packages/typescript-config/`
+
+**特点**:
+
+- 只包含配置文件，不包含业务逻辑
+- 不需要构建过程（没有 `build` 脚本）
+- 通过 `exports` 字段导出配置供其他包使用
+- 作为 `devDependencies` 被其他包引用
+
+**示例**:
+
+- `@workspace/eslint-config`: 提供 ESLint 配置（base、next-js、react-internal）
+- `@workspace/typescript-config`: 提供 TypeScript 配置（base、nextjs、react-library）
+
+**最佳实践**:
+
+- ✅ 配置包不应该有 `build` 脚本
+- ✅ 配置包应该只作为 `devDependencies`
+- ✅ Turborepo 会自动跳过没有 build 任务的包
+
+#### 2. 共享包 (Shared Packages)
+
+**位置**: `packages/ui/`
+
+**特点**:
+
+- 包含可复用的业务逻辑或组件
+- 可能包含构建过程（如果有编译需求）
+- 可以被多个应用引用
+- 依赖配置包（开发时依赖）
+
+**示例**:
+
+- `@workspace/ui`: 共享 UI 组件库，包含 React 组件、样式和工具函数
+
+**依赖关系**:
+
+- 依赖 `@workspace/eslint-config`（开发时配置）
+- 依赖 `@workspace/typescript-config`（开发时配置）
+
+#### 3. 应用 (Applications)
+
+**位置**: `apps/web/`
+
+**特点**:
+
+- 独立的可部署应用
+- 包含完整的构建和运行脚本
+- 依赖共享包和配置包
+- 是最终的产品输出
+
+**示例**:
+
+- `web`: Next.js 应用，使用 UI 组件库和共享配置
+
+**依赖关系**:
+
+- 运行时依赖 `@workspace/ui`
+- 开发时依赖 `@workspace/eslint-config`
+- 开发时依赖 `@workspace/typescript-config`
+
+### 依赖关系图
+
+```
+@workspace/eslint-config (配置包，无 build)
+@workspace/typescript-config (配置包，无 build)
+    ↓
+@workspace/ui (共享包，有 lint/check-types)
+    ↓
+web (应用，有 build/dev/lint/check-types)
+```
+
+**说明**:
+
+- 配置包出现在依赖图中是因为它们被其他包依赖
+- Turborepo 会自动跳过没有 build 任务的包
+- 使用 `dependsOn: ["^build"]` 时，只会等待有 build 任务的依赖包
+
+### Turborepo 任务配置
+
+在 `turbo.json` 中配置的任务会自动处理包类型差异：
+
+```json
+{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"], // 只等待有 build 任务的依赖包
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"] // 配置包可以没有 lint 任务
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"] // 类型检查依赖关系
+    },
+    "clean": {
+      "cache": false,
+      "dependsOn": [] // 清理任务不需要依赖
+    },
+    "deep-clean": {
+      "cache": false,
+      "dependsOn": [] // 深度清理任务不需要依赖
+    }
+  }
+}
+```
+
+**关键点**:
+
+- `dependsOn: ["^build"]` 中的 `^` 表示只等待依赖包的 build
+- 如果依赖包没有对应的任务，Turborepo 会自动跳过
+- 配置包不需要 build 任务，不会影响构建流程
+
+### 架构优势
+
+1. **清晰的依赖层次**: 配置包 → 共享包 → 应用，依赖关系一目了然
+2. **高效的构建流程**: 配置包无需构建，减少不必要的构建步骤
+3. **易于维护**: 配置集中管理，修改一处即可影响所有包
+4. **类型安全**: TypeScript 配置统一，确保类型一致性
+5. **代码复用**: 共享包可以被多个应用复用，减少重复代码
+
+### 添加新包的指南
+
+#### 添加新的配置包
+
+1. 在 `packages/` 下创建新目录
+2. 创建 `package.json`，设置 `exports` 字段
+3. **不要**添加 `build` 脚本
+4. 在 `pnpm-workspace.yaml` 中确保包被包含
+
+#### 添加新的共享包
+
+1. 在 `packages/` 下创建新目录
+2. 创建 `package.json`，添加必要的脚本（lint、check-types 等）
+3. 如果需要构建，添加 `build` 脚本
+4. 在 `turbo.json` 中配置相应的任务
+
+#### 添加新的应用
+
+1. 在 `apps/` 下创建新目录
+2. 创建完整的应用结构
+3. 添加所有必要的脚本（dev、build、lint、check-types 等）
+4. 在 `turbo.json` 中确保任务配置正确
+
+### 可视化依赖关系
+
+使用 Turborepo Devtools 可视化依赖关系和任务执行：
+
+```bash
+# 启动 Devtools
+pnpm devtools
+
+# 在浏览器中打开显示的地址，可以：
+# - 查看包之间的依赖关系图
+# - 实时监控任务执行状态
+# - 分析构建性能和缓存命中率
+# - 查看任务执行历史
+```
+
+Devtools 提供了比静态依赖图更强大的功能，包括实时监控、交互式探索和性能分析。
+
+## 脚本命令
+
+项目在根目录 `package.json` 中提供了多个常用的开发脚本命令，方便日常开发工作, 其中和turbo任务集成的命令，实际上是触发了turbo命令，再通过turborepo去触发各个子应用和共享包对应的脚本命令。
+
+### 可用脚本
+
+| 命令                | 用途           | Turborepo 集成 | 说明                                                  |
+| ------------------- | -------------- | -------------- | ----------------------------------------------------- |
+| `pnpm dev`          | 启动开发服务器 | ✅             | 使用 Turborepo 并行启动所有子包的开发服务器           |
+| `pnpm build`        | 构建项目       | ✅             | 使用 Turborepo 并行构建所有子包                       |
+| `pnpm lint`         | 代码检查       | ✅             | 使用 Turborepo 并行执行所有子包的 ESLint 检查         |
+| `pnpm check-types`  | 类型检查       | ✅             | 使用 Turborepo 并行执行所有子包的 TypeScript 类型检查 |
+| `pnpm format`       | 格式化代码     | ❌             | 使用 Prettier 格式化所有文件（会修改文件）            |
+| `pnpm format:check` | 检查代码格式   | ❌             | 使用 Prettier 检查代码格式（不修改文件）              |
+| `pnpm clean`        | 清理构建产物   | ✅             | 使用 Turborepo 并行清理所有子包的构建产物和缓存文件   |
+| `pnpm deep-clean`   | 深度清理       | ✅             | 清理 Turborepo 缓存并执行所有子包的清理任务           |
+| `pnpm devtools`     | 开发工具       | ✅             | 启动 Turborepo Devtools 可视化工具                    |
+
+### 详细说明
+
+#### 开发与构建
+
+```bash
+# 启动开发服务器（所有子包）
+pnpm dev
+
+# 构建所有子包
+pnpm build
+```
+
+#### 代码质量检查
+
+```bash
+# 检查代码 lint 规则
+pnpm lint
+
+# 检查 TypeScript 类型
+pnpm check-types
+
+# 检查代码格式（不修改文件）
+pnpm format:check
+
+# 自动修复代码格式
+pnpm format
+```
+
+#### 清理与可视化
+
+```bash
+# 清理所有构建产物和缓存
+pnpm clean
+
+# 深度清理（包括 Turborepo 缓存）
+pnpm deep-clean
+
+# 启动 Turborepo Devtools 可视化工具
+pnpm devtools
+```
+
+### clean 脚本说明
+
+`clean` 脚本通过 Turborepo 执行，会并行清理所有子包的构建产物和缓存文件。
+
+**清理内容**（由各子包的 `clean` 脚本定义）:
+
+- `.turbo/` - Turborepo 缓存目录（仅子包级别）
+- `dist/` - 构建输出目录
+- `build/` - 构建输出目录
+- `.next/` - Next.js 构建输出目录
+- `node_modules/.cache/` - 各种工具的缓存目录
+- `.eslintcache` - ESLint 缓存文件
+- `.prettiercache` - Prettier 缓存文件
+
+**注意**: `clean` 脚本不会删除 `node_modules/` 目录，如需完全清理，请手动删除。各子包需要在 `package.json` 中定义自己的 `clean` 脚本来指定要清理的内容。
+
+### deep-clean 脚本说明
+
+`deep-clean` 脚本执行更彻底的清理，包括：
+
+1. **清理 Turborepo 根缓存**: 使用 `turbo clean` 清理根目录的 `.turbo/` 缓存
+2. **清理所有子包**: 然后执行 `turbo run clean` 清理所有子包的构建产物
+
+**与 `clean` 的区别**:
+
+- `clean`: 只清理子包的构建产物，保留 Turborepo 根缓存
+- `deep-clean`: 清理 Turborepo 根缓存 + 所有子包的构建产物
+
+**使用场景**:
+
+- 当遇到缓存问题时，使用 `deep-clean` 可以完全重置构建环境
+- 在 CI/CD 环境中，可以使用 `deep-clean` 确保干净的构建
+- 当依赖关系发生变化时，使用 `deep-clean` 可以避免缓存导致的构建错误
+
+**注意**: `deep-clean` 会删除所有缓存，下次构建会重新计算所有任务，构建时间会变长。
+
+### devtools 脚本说明
+
+`devtools` 脚本启动 Turborepo Devtools，这是一个强大的可视化工具，可以：
+
+- **实时监控**: 实时查看任务执行状态和性能指标
+- **依赖关系可视化**: 交互式查看包之间的依赖关系
+- **任务分析**: 分析任务执行时间、缓存命中率等
+- **性能优化**: 识别构建瓶颈和优化机会
+- **缓存管理**: 查看和管理 Turborepo 缓存
+
+**使用方法**:
+
+```bash
+# 启动 Devtools
+pnpm devtools
+
+# 启动后，会在终端显示访问地址：
+# WebSocket: ws://localhost:9876
+# Browser:   https://turborepo.dev/devtools?port=9876
+```
+
+**功能特性**:
+
+- **任务监控**: 实时查看所有任务的执行状态
+- **依赖图**: 交互式依赖关系图，支持缩放和搜索
+- **性能分析**: 查看任务执行时间、缓存命中率等指标
+- **历史记录**: 查看历史任务执行记录
+- **过滤功能**: 按包、任务类型等过滤视图
+
+**注意**: Devtools 需要在开发环境中运行，按 `Ctrl+C` 可以停止服务。
+
+### Turborepo 集成
+
+以下脚本通过 Turborepo 执行，享受缓存和并行执行的优势：
+
+- `dev` - 开发服务器
+- `build` - 构建任务
+- `lint` - 代码检查
+- `check-types` - 类型检查
+- `clean` - 清理构建产物
+- `deep-clean` - 深度清理（包括 Turborepo 缓存）
+- `devtools` - 开发工具（可视化监控和分析）
+
+这些任务在 `turbo.json` 中配置了依赖关系和缓存策略，确保高效的开发体验。
+
 ## 代码质量与提交规范
 
 项目集成了 **Husky**、**lint-staged** 和 **commitlint**，用于在提交前自动检查代码质量和规范提交信息格式。
