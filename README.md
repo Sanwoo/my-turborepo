@@ -357,13 +357,57 @@ pnpm exec lint-staged
 pnpm exec commitlint --edit $1
 ```
 
-**注意**:
-
-- 使用 `pnpm exec` 而不是 `pnpm dlx`，因为 `lint-staged` 和 `commitlint` 已经在 `devDependencies` 中安装
-- `pnpm exec` 直接运行本地安装的包，比 `pnpm dlx`（临时下载）更快更可靠
-- 不需要 `--no` 选项（这是 `npx` 的选项，`pnpm dlx` 不支持）
-
 **注意**: 这种格式在 Husky v9 和 v10 中都可以正常工作，避免了升级时的兼容性问题。
+
+#### npx vs pnpm exec 的区别
+
+**为什么官方文档使用 `npx`？**
+
+官方文档（如 [lint-staged](https://github.com/lint-staged/lint-staged) 和 [commitlint](https://commitlint.js.org/)）使用 `npx` 的原因：
+
+1. **通用性**: `npx` 随 npm 一起提供，几乎所有 Node.js 环境都有，无需额外安装
+2. **跨包管理器兼容**: 无论使用 npm、yarn 还是 pnpm，`npx` 都能工作
+3. **智能查找**: `npx` 会优先使用本地已安装的包，如果不存在才临时下载
+4. **文档可复制性**: 示例代码可以直接复制使用，无需考虑包管理器
+
+**npx 的工作方式**:
+
+- 首先查找 `node_modules/.bin` 中的本地安装包
+- 如果找不到，临时下载并执行
+- 支持 `--no` 选项防止自动安装（`npx --no -- commitlint`）
+
+**pnpm exec 的优势**（适合我们的场景）:
+
+1. **更快**: 直接运行本地已安装的包，无需查找或下载
+2. **更可靠**: 使用项目依赖的精确版本，避免版本不一致
+3. **离线工作**: 不依赖网络，完全使用本地安装的包
+4. **Monorepo 友好**: 在 pnpm workspace 中正确解析依赖
+5. **明确性**: 明确表示使用本地安装的包，而不是临时下载
+
+**pnpm exec vs pnpm dlx**:
+
+- `pnpm exec`: 运行本地已安装的包（类似 `npm exec`）
+- `pnpm dlx`: 临时下载并运行包（类似 `npx`，但不支持 `--no` 选项）
+
+**我们的选择**:
+
+由于项目：
+
+- 使用 pnpm 作为包管理器（`packageManager: "pnpm@10.28.0"`）
+- `lint-staged` 和 `commitlint` 已在 `devDependencies` 中安装
+- 是 Turborepo monorepo，需要确保使用正确的依赖版本
+
+因此选择 `pnpm exec` 是最佳实践，它：
+
+- 更快（无需查找或下载）
+- 更可靠（使用项目依赖的版本）
+- 更符合 pnpm monorepo 的最佳实践
+
+**总结**:
+
+- **通用场景/文档示例**: 使用 `npx`（兼容性最好）
+- **pnpm 项目 + 本地已安装**: 使用 `pnpm exec`（更快更可靠，当前使用）
+- **临时运行未安装的包**: 使用 `pnpm dlx`（类似 npx，但不支持 `--no`）
 
 #### 工作原理
 
