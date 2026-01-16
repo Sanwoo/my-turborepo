@@ -341,6 +341,30 @@ pnpx add-skill vercel-labs/agent-skills
   - `pre-commit`: 在提交前运行 `lint-staged`，对暂存文件进行格式化和检查
   - `commit-msg`: 在提交时验证 commit message 格式是否符合规范
 
+#### Hook 文件格式
+
+Husky hooks 文件使用简化的格式，移除了旧版本的 `#!/usr/bin/env sh` 和 `. "$(dirname -- "$0")/_/husky.sh"` 行，以兼容 Husky v10.0.0。
+
+**示例** (`.husky/pre-commit`):
+
+```bash
+pnpm exec lint-staged
+```
+
+**示例** (`.husky/commit-msg`):
+
+```bash
+pnpm exec commitlint --edit $1
+```
+
+**注意**:
+
+- 使用 `pnpm exec` 而不是 `pnpm dlx`，因为 `lint-staged` 和 `commitlint` 已经在 `devDependencies` 中安装
+- `pnpm exec` 直接运行本地安装的包，比 `pnpm dlx`（临时下载）更快更可靠
+- 不需要 `--no` 选项（这是 `npx` 的选项，`pnpm dlx` 不支持）
+
+**注意**: 这种格式在 Husky v9 和 v10 中都可以正常工作，避免了升级时的兼容性问题。
+
 #### 工作原理
 
 1. 当执行 `git commit` 时，Husky 会自动触发 `pre-commit` hook
