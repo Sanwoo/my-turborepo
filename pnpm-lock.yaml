@@ -159,55 +159,6 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  apps/app-b:
-    dependencies:
-      '@workspace/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      lucide-react:
-        specifier: 'catalog:'
-        version: 0.475.0(react@19.2.3)
-      next:
-        specifier: 'catalog:'
-        version: 16.1.3(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      next-themes:
-        specifier: 'catalog:'
-        version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.3
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.3(react@19.2.3)
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 20.19.25
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.3(@types/react@19.2.7)
-      '@workspace/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@workspace/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      babel-plugin-react-compiler:
-        specifier: 'catalog:'
-        version: 1.0.0
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.1(jiti@2.6.1)
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 3.4.19(yaml@2.8.2)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-
   apps/nextjs-template:
     dependencies:
       '@workspace/ui':
@@ -250,55 +201,6 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.1(jiti@1.21.7)
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 3.4.19(yaml@2.8.2)
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-
-  apps/test:
-    dependencies:
-      '@workspace/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      lucide-react:
-        specifier: 'catalog:'
-        version: 0.475.0(react@19.2.3)
-      next:
-        specifier: 'catalog:'
-        version: 16.1.3(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      next-themes:
-        specifier: 'catalog:'
-        version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.3
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.3(react@19.2.3)
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 20.19.25
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.2.3(@types/react@19.2.7)
-      '@workspace/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@workspace/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
-      babel-plugin-react-compiler:
-        specifier: 'catalog:'
-        version: 1.0.0
-      eslint:
-        specifier: 'catalog:'
-        version: 9.39.1(jiti@2.6.1)
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.19(yaml@2.8.2)
