@@ -10,10 +10,10 @@ pnpm dlx shadcn@latest init
 
 ## Adding components
 
-To add components to your app, run the following command at the root of your `web` app:
+To add components to your app, run the following command at the root of your `nextjs-template` app:
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
+pnpm dlx shadcn@latest add button -c apps/nextjs-template
 ```
 
 This will place the ui components in the `packages/ui/src/components` directory.
@@ -254,17 +254,18 @@ pnpx add-skill vercel-labs/agent-skills
 #### 分类结构
 
 1. **核心框架** (Core Framework)
-   - `react@^19.2.1`, `react-dom@^19.2.1`, `next@^16.1.1`
+   - `react@^19.2.3`, `react-dom@^19.2.3`, `next@^16.1.3`
 
 2. **开发工具** (Development Tools)
    - `typescript@^5.9.3`, `eslint@^9.39.1`
    - `@eslint/eslintrc@^3.3.1`, `@eslint/js@^9.39.1`
    - `@typescript-eslint/eslint-plugin@^8.39.0`, `@typescript-eslint/parser@^8.39.0`
-   - `eslint-config-next@^15.4.5`, `eslint-config-prettier@^9.1.2`
+   - `eslint-config-next@^16.1.3`, `eslint-config-prettier@^10.1.8`
    - `eslint-plugin-only-warn@^1.1.0`, `eslint-plugin-tailwindcss@^3.18.2`, `eslint-plugin-turbo@^2.5.5`
    - `prettier-plugin-tailwindcss@^0.7.2`, `typescript-eslint@^8.39.0`
    - `husky@^9.1.7`, `lint-staged@^16.2.7`
    - `@commitlint/cli@^20.3.1`, `@commitlint/config-conventional@^20.3.1`
+   - `babel-plugin-react-compiler@^1.0.0`
 
 3. **类型定义** (Type Definitions)
    - `@types/node@^20.19.25`, `@types/react@^19.2.7`, `@types/react-dom@^19.2.3`
@@ -304,18 +305,20 @@ pnpx add-skill vercel-labs/agent-skills
 
 ### 版本更新
 
-- **Next.js**: 已更新到 `v16.1.1`（最新版本）
-- **Tailwind CSS**: 已从 `v4.x` 降级到 `v3.4.17`（更好的兼容性）
-- **Turbo**: 已从 `v2.6.3` 升级到 `v2.7.4`（使用 `@turbo/codemod` 自动升级，无需 codemod 迁移）
+- **React**: 已更新到 `v19.2.3`(最新版本)
+- **Next.js**: 已更新到 `v16.1.3`(最新版本,支持 React Compiler)
+- **Tailwind CSS**: 已从 `v4.x` 降级到 `v3.4.17`(更好的兼容性)
+- **Turbo**: 已从 `v2.6.3` 升级到 `v2.7.4`(使用 `@turbo/codemod` 自动升级,无需 codemod 迁移)
+- **ESLint Config**: `eslint-config-next` 升级到 `v16.1.3`, `eslint-config-prettier` 升级到 `v10.1.8`）
 
 ### 添加新的依赖
 
 当需要添加新的依赖时：
 
-1. **确定依赖分类**: 根据依赖的功能，确定应该属于哪个分类（核心框架、开发工具、UI 组件库等）
-2. **添加到 catalog**: 在 `pnpm-workspace.yaml` 的 `catalog` 部分，按照分类添加依赖和版本
-3. **在子包中引用**: 在子包的 `package.json` 中使用 `catalog:` 协议引用
-4. **更新依赖**: 运行 `pnpm install` 更新依赖
+1.  **确定依赖分类**: 根据依赖的功能，确定应该属于哪个分类（核心框架、开发工具、UI 组件库等）
+2.  **添加到 catalog**: 在 `pnpm-workspace.yaml` 的 `catalog` 部分，按照分类添加依赖和版本
+3.  **在子包中引用**: 在子包的 `package.json` 中使用 `catalog:` 协议引用
+4.  **更新依赖**: 运行 `pnpm install` 更新依赖
 
 **注意**: 所有依赖都应该通过 catalog 管理，即使是只在单个子包中使用的依赖，也建议添加到 catalog 中以保持一致性。
 
@@ -342,7 +345,7 @@ Level 1 (共享层 - 共享包):
   └── @workspace/ui                 # UI 组件库
 
 Level 2 (应用层 - 应用):
-  └── web                           # Next.js 应用
+  └── nextjs-template               # Next.js 应用模板(使用 src 目录结构)
 ```
 
 ### 包类型说明
@@ -391,7 +394,7 @@ Level 2 (应用层 - 应用):
 
 #### 3. 应用 (Applications)
 
-**位置**: `apps/web/`
+**位置**: `apps/nextjs-template/`
 
 **特点**:
 
@@ -399,31 +402,46 @@ Level 2 (应用层 - 应用):
 - 包含完整的构建和运行脚本
 - 依赖共享包和配置包
 - 是最终的产品输出
+- **使用标准 src 目录结构**,符合 Next.js 最佳实践
+
+**目录结构**:
+
+```
+apps/nextjs-template/
+├── src/                    # 源代码目录
+│   ├── app/               # Next.js App Router
+│   ├── components/        # React 组件
+│   ├── hooks/             # 自定义 Hooks
+│   └── lib/               # 工具函数
+├── next.config.ts         # Next.js 配置(启用 React Compiler)
+├── tailwind.config.ts     # Tailwind CSS 配置
+└── tsconfig.json          # TypeScript 配置
+```
 
 **示例**:
 
-- `web`: Next.js 应用，使用 UI 组件库和共享配置
+- `nextjs-template`: Next.js 应用模板,使用 UI 组件库和共享配置,启用 React Compiler
 
 **依赖关系**:
 
 - 运行时依赖 `@workspace/ui`
 - 开发时依赖 `@workspace/eslint-config`
 - 开发时依赖 `@workspace/typescript-config`
+- 开发时依赖 `babel-plugin-react-compiler`(React Compiler 支持)
 
 ### 依赖关系图
 
 ```
-@workspace/eslint-config (配置包，无 build)
-@workspace/typescript-config (配置包，无 build)
+@workspace/eslint-config (配置包,无 build)
+@workspace/typescript-config (配置包,无 build)
     ↓
-@workspace/ui (共享包，有 lint/check-types)
+@workspace/ui (共享包,有 lint/check-types)
     ↓
-web (应用，有 build/dev/lint/check-types)
+nextjs-template (应用,有 build/dev/lint/check-types,启用 React Compiler)
 ```
 
 **说明**:
 
-- 配置包出现在依赖图中是因为它们被其他包依赖
 - Turborepo 会自动跳过没有 build 任务的包
 - 使用 `dependsOn: ["^build"]` 时，只会等待有 build 任务的依赖包
 
@@ -972,7 +990,7 @@ plugins: {
 **新增文件**:
 
 - `packages/ui/tailwind.config.ts` - UI 包的 Tailwind 配置
-- `apps/web/tailwind.config.ts` - Web 应用的 Tailwind 配置（继承 UI 包配置）
+- `apps/nextjs-template/tailwind.config.ts` - Next.js 应用的 Tailwind 配置(继承 UI 包配置)
 
 **packages/ui/tailwind.config.ts** 包含：
 
@@ -1010,14 +1028,14 @@ plugins: {
   }
   ```
 
-**apps/web/tailwind.config.ts** 继承 UI 包配置：
+**apps/nextjs-template/tailwind.config.ts** 继承 UI 包配置:
 
 ```typescript
 import uiConfig from '@workspace/ui/tailwind.config'
 
 const config: Config = {
   ...uiConfig,
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', '../../packages/ui/src/**/*.{ts,tsx}'],
+  content: ['./src/app/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}', '../../packages/ui/src/**/*.{ts,tsx}'],
 }
 ```
 
@@ -1125,8 +1143,8 @@ const config: Config = {
 1. ✅ **更新 `pnpm-workspace.yaml`**: 移除 `@tailwindcss/postcss@^4.1.17`，添加 `autoprefixer@^10.4.20`
 
 2. ✅ **更新 `package.json` 文件**:
-   - `packages/ui/package.json`: 移除 `@tailwindcss/postcss`，添加 `autoprefixer`
-   - `apps/web/package.json`: 移除 `@tailwindcss/postcss`（如果存在）
+   - `packages/ui/package.json`: 移除 `@tailwindcss/postcss`,添加 `autoprefixer`
+   - `apps/nextjs-template/package.json`: 移除 `@tailwindcss/postcss`(如果存在)
    - `packages/ui/package.json`: 在 `exports` 中添加 `"./tailwind.config": "./tailwind.config.ts"`
 
 3. ✅ **更新 `postcss.config.mjs`**:
@@ -1134,7 +1152,7 @@ const config: Config = {
 
 4. ✅ **创建 Tailwind 配置文件**:
    - `packages/ui/tailwind.config.ts`: 配置 content、darkMode 和 theme.extend
-   - `apps/web/tailwind.config.ts`: 继承 UI 包配置，覆盖 content 路径
+   - `apps/nextjs-template/tailwind.config.ts`: 继承 UI 包配置,覆盖 content 路径(适配 src 目录结构)
 
 5. ✅ **更新 `globals.css`**:
    - 调整 `@import` 顺序（必须在 `@tailwind` 之前）
@@ -1157,5 +1175,141 @@ const config: Config = {
 - [Tailwind CSS v3 文档](https://tailwindcss.com/docs)
 - [Tailwind CSS v3 配置指南](https://tailwindcss.com/docs/configuration)
 - [从 v4 迁移到 v3](https://tailwindcss.com/docs/upgrade-guide)
+
+## React Compiler 支持
+
+项目已在 `nextjs-template` 应用中启用 **React Compiler**,这是 React 19 的新特性,可以自动优化组件性能。
+
+### 什么是 React Compiler?
+
+React Compiler 是 React 团队开发的编译时优化工具,可以:
+
+- **自动记忆化**: 自动优化组件和 hooks,减少不必要的重新渲染
+- **性能提升**: 无需手动使用 `useMemo`、`useCallback` 和 `React.memo`
+- **代码简化**: 编写更简洁的代码,编译器自动处理优化
+
+### 配置说明
+
+#### 1. 依赖安装
+
+在 `pnpm-workspace.yaml` 中添加:
+
+```yaml
+catalog:
+  'babel-plugin-react-compiler': ^1.0.0
+```
+
+在应用的 `package.json` 中引用:
+
+```json
+{
+  "devDependencies": {
+    "babel-plugin-react-compiler": "catalog:"
+  }
+}
+```
+
+#### 2. Next.js 配置
+
+在 `apps/nextjs-template/next.config.ts` 中启用:
+
+```typescript
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  reactCompiler: true, // 启用 React Compiler
+}
+
+export default nextConfig
+```
+
+### 使用方式
+
+启用 React Compiler 后,**无需修改现有代码**。编译器会自动分析并优化你的组件:
+
+**优化前** (手动优化):
+
+```tsx
+const Component = () => {
+  const expensiveValue = useMemo(() => computeExpensive(data), [data])
+  const handleClick = useCallback(() => doSomething(), [])
+
+  return <Child value={expensiveValue} onClick={handleClick} />
+}
+```
+
+**优化后** (React Compiler 自动处理):
+
+```tsx
+const Component = () => {
+  const expensiveValue = computeExpensive(data)
+  const handleClick = () => doSomething()
+
+  return <Child value={expensiveValue} onClick={handleClick} />
+}
+```
+
+编译器会自动识别需要优化的部分并进行记忆化处理。
+
+### 兼容性
+
+- **React 版本**: 需要 React 19+ (项目使用 `^19.2.3`)
+- **Next.js 版本**: 需要 Next.js 16+ (项目使用 `^16.1.3`)
+- **TypeScript**: 完全支持 TypeScript
+
+### 最佳实践
+
+1. **保持代码简洁**: 不再需要手动添加 `useMemo`、`useCallback`
+2. **遵循 React 规则**: 编译器基于 React 的规则进行优化,确保遵循 React 最佳实践
+3. **渐进式采用**: 可以在部分组件中使用,与现有代码兼容
+
+### 性能监控
+
+使用 React DevTools Profiler 可以查看编译器的优化效果:
+
+```bash
+# 安装 React DevTools
+# Chrome: https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi
+```
+
+### 参考资源
+
+- [React Compiler 官方文档](https://react.dev/learn/react-compiler)
+- [Next.js React Compiler 配置](https://nextjs.org/docs/app/api-reference/config/next-config-js/reactCompiler)
+- [React 19 发布说明](https://react.dev/blog/2024/12/05/react-19)
+
+## 项目目录结构
+
+项目采用标准的 Turborepo monorepo 结构,`nextjs-template` 应用使用 **src 目录结构**:
+
+```
+my-turborepo/
+├── apps/
+│   └── nextjs-template/          # Next.js 应用模板
+│       ├── src/                  # 源代码目录 (标准结构)
+│       │   ├── app/             # Next.js App Router
+│       │   ├── components/      # React 组件
+│       │   ├── hooks/           # 自定义 Hooks
+│       │   └── lib/             # 工具函数
+│       ├── next.config.ts       # Next.js 配置 (启用 React Compiler)
+│       ├── tailwind.config.ts   # Tailwind CSS 配置
+│       ├── tsconfig.json        # TypeScript 配置
+│       └── package.json         # 依赖配置
+├── packages/
+│   ├── ui/                      # 共享 UI 组件库
+│   ├── eslint-config/           # ESLint 共享配置
+│   └── typescript-config/       # TypeScript 共享配置
+├── pnpm-workspace.yaml          # pnpm workspace 配置
+├── turbo.json                   # Turborepo 配置
+└── package.json                 # 根 package.json
+
+```
+
+### src 目录结构优势
+
+1. **符合 Next.js 最佳实践**: `create-next-app` 默认生成的结构
+2. **代码组织清晰**: 源代码与配置文件分离
+3. **易于维护**: 所有业务代码集中在 `src` 目录
+4. **团队协作友好**: 更符合开发者习惯
 
 # my-turborepo

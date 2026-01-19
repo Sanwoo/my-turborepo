@@ -28,6 +28,7 @@
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
-    "tailwindcss": "catalog:"
+    "tailwindcss": "catalog:",
+    "babel-plugin-react-compiler": "catalog:"
   }
 }
