@@ -94,6 +94,13 @@ export default function generator(plop: TurboPlop): void {
         pattern: /"dev": "next dev --turbopack"/g,
         template: '"dev": "next dev --turbopack -p {{port}}"',
       },
+      // 在根目录 package.json 中添加 dev 脚本
+      {
+        type: 'modify',
+        path: '{{ turbo.paths.root }}/package.json',
+        pattern: /"dev:nextjs-template": "turbo dev --filter=nextjs-template",/g,
+        template: '"dev:nextjs-template": "turbo dev --filter=nextjs-template",\n    "dev:{{ dashCase name }}": "turbo dev --filter={{ dashCase name }}",',
+      },
       // 显示成功消息
       (answers) => {
         const { name, port } = answers as TurboAnswers
