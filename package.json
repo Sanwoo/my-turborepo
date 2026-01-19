@@ -12,7 +12,8 @@
     "clean": "turbo run clean",
     "deep-clean": "turbo clean && turbo run clean",
     "prepare": "husky install",
-    "devtools": "turbo devtools"
+    "devtools": "turbo devtools",
+    "gen:app": "turbo gen nextjs-app"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:",

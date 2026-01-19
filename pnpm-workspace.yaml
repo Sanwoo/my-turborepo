@@ -1,6 +1,7 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+  - 'turbo/*'
 
 catalog:
   # 核心框架 (Core Framework)
