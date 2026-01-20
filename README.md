@@ -2,6 +2,9 @@
 
 This template is for creating a monorepo with shadcn/ui.
 
+> [!IMPORTANT]
+> **兼容性说明**：本项目特意保持使用 **Tailwind CSS v3 (3.4.17)** 版本，以确保在旧版浏览器和遗留设备上的最佳兼容性。请勿在未评估兼容性影响的情况下升级到 v4。
+
 ## Usage
 
 ```bash
@@ -47,9 +50,12 @@ pnpm dlx shadcn@latest add button -c apps/nextjs-template
 
 This will place the ui components in the `packages/ui/src/components` directory.
 
-## Tailwind
+## Tailwind CSS v3
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+> [!NOTE]
+> 为了更好的设备兼容性，本项目使用了 Tailwind CSS v3。
+
+您的 `tailwind.config.ts` 和 `globals.css` 已配置为与 `ui` 包中的组件配合使用。
 
 ## Using components
 
@@ -1350,5 +1356,3 @@ my-turborepo/
 2. **代码组织清晰**: 源代码与配置文件分离
 3. **易于维护**: 所有业务代码集中在 `src` 目录
 4. **团队协作友好**: 更符合开发者习惯
-
-# my-turborepo
