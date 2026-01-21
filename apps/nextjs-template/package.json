@@ -10,11 +10,10 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf .turbo .next dist"
+    "clean": "rm -rf .turbo .next dist node_modules"
   },
   "dependencies": {
     "@workspace/ui": "workspace:*",
-    "lucide-react": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",

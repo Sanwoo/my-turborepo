@@ -1,31 +1,44 @@
 import js from '@eslint/js'
-import { FlatCompat } from '@eslint/eslintrc'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import globals from 'globals'
+import onlyWarn from 'eslint-plugin-only-warn'
 import pluginTailwindcss from 'eslint-plugin-tailwindcss'
-import tseslint from 'typescript-eslint'
-
-import { config as baseConfig } from './base.js'
-
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-})
+import turboPlugin from 'eslint-plugin-turbo'
+import nextVitals from 'eslint-config-next/core-web-vitals'
+import nextTs from 'eslint-config-next/typescript'
 
 /**
- * A custom ESLint configuration for libraries that use Next.js.
+ * A unified ESLint configuration for Next.js applications and React libraries.
+ * This configuration includes all base rules, React rules, Next.js rules, and Tailwind CSS support.
  *
  * @type {import("eslint").Linter.Config}
  * */
 export const nextJsConfig = [
-  ...baseConfig,
   js.configs.recommended,
   eslintConfigPrettier,
-  ...tseslint.configs.recommended,
-  ...compat.extends('next'),
+  ...nextTs,
+  {
+    plugins: {
+      turbo: turboPlugin,
+    },
+    rules: {
+      'turbo/no-undeclared-env-vars': 'warn',
+    },
+  },
+  {
+    plugins: {
+      onlyWarn,
+    },
+  },
+  {
+    ignores: ['dist/**'],
+  },
+  ...nextVitals,
   {
     languageOptions: {
       globals: {
         ...globals.serviceworker,
+        ...globals.browser,
       },
     },
     settings: { react: { version: 'detect' } },

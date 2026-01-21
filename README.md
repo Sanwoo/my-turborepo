@@ -71,60 +71,68 @@ import { Button } from '@workspace/ui/components/button'
 
 ### 配置架构
 
-项目采用分层 ESLint 配置架构：
+项目采用统一的 ESLint 配置架构：
 
 1. **共享配置包** (`packages/eslint-config/`):
-   - `base.js` - 基础配置，包含通用规则
-   - `next.js` - Next.js 应用配置
-   - `react-internal.js` - React 库配置
+   - `next.js` - 统一的 ESLint 配置，适用于 Next.js 应用和 React 库
+     - 包含基础规则（ESLint 推荐、Prettier 兼容、TypeScript）
+     - 包含 React 和 React Hooks 规则（通过 `eslint-config-next/core-web-vitals`）
+     - 包含 Next.js 特定规则
+     - 包含 Tailwind CSS 支持
+     - 包含 Turbo 和 only-warn 插件
 
 2. **根目录配置** (`eslint.config.js`):
    - 使用 flat config 格式（ES modules）
-   - 引用 `@workspace/eslint-config/base` 作为基础配置
+   - 引用 `@workspace/eslint-config/next-js` 作为统一配置
    - 仅应用于根目录文件，忽略 `apps/**` 和 `packages/**`
 
 3. **子包配置**:
    - 每个子包（`apps/*` 和 `packages/*`）都有自己的 `eslint.config.js`
-   - 根据包的类型引用相应的共享配置
+   - 统一使用 `@workspace/eslint-config/next-js` 配置
 
 ### 配置说明
 
-#### 根目录配置
+#### 统一配置
 
-**文件**: `eslint.config.mjs`（项目根目录）
+**文件**: `packages/eslint-config/next.js`
 
-- 使用 **flat config 格式**（ESLint 9.x 新格式）
-- 使用 **ES modules** (`import/export`)
-- 引用 `@workspace/eslint-config/base` 作为基础配置
-- 支持 TypeScript 文件（`.ts`, `.js`）
-- 忽略子包目录：`apps/**`, `packages/**`
+这是项目的统一 ESLint 配置，适用于所有 Next.js 应用和 React 库。
+
+**包含的配置**:
+
+- **基础规则**: ESLint 推荐规则、Prettier 兼容、TypeScript 规则
+- **React 规则**: 通过 `eslint-config-next/core-web-vitals` 包含 React 和 React Hooks 规则
+- **Next.js 规则**: Next.js 特定的 ESLint 规则
+- **Tailwind CSS**: Tailwind CSS 类名检查和验证
+- **工具插件**: Turbo 插件（环境变量检查）、only-warn 插件（将错误转为警告）
 
 **配置示例**:
 
+根目录配置 (`eslint.config.js`):
+
 ```javascript
-import { config as baseConfig } from '@workspace/eslint-config/base'
+import { nextJsConfig } from '@workspace/eslint-config/next-js'
 
 export default [
-  ...baseConfig,
+  ...nextJsConfig,
   {
     ignores: ['apps/**', 'packages/**', 'node_modules/**', '.next/**', 'dist/**', 'build/**', '.turbo/**'],
   },
 ]
 ```
 
-**注意**: 使用 `.mjs` 扩展名明确指定为 ES module，避免需要在 `package.json` 中添加 `"type": "module"`。
+子包配置（如 `packages/ui/eslint.config.js`）:
 
-#### Next.js 应用配置
+```javascript
+import { nextJsConfig } from '@workspace/eslint-config/next-js'
 
-**文件**: `packages/eslint-config/next.js`
+export default nextJsConfig
+```
 
-- 使用 `eslint-config-next` 作为 Next.js 应用的 ESLint 配置
-- 包含以下插件的推荐规则集：
-  - `@next/eslint-plugin-next` - Next.js 特定的 ESLint 规则
-  - `eslint-plugin-react` - React 的推荐规则
-  - `eslint-plugin-react-hooks` - React Hooks 的推荐规则
-- 配置通过 `@eslint/eslintrc` 的 `FlatCompat` 兼容层适配 ESLint 9.x 的 flat config 格式
-- 保留了必要的自定义规则，如 `react/react-in-jsx-scope: "off"` 和 `react/prop-types: "off"`
+**自定义规则**:
+
+- `react/react-in-jsx-scope: "off"` - 新 JSX 转换不需要 React 导入
+- `react/prop-types: "off"` - 使用 TypeScript 进行类型检查
 
 ### Tailwind CSS ESLint 支持
 
@@ -140,15 +148,43 @@ export default [
 
 ### 变更历史
 
+#### ESLint 配置统一化与依赖清理
+
+- **变更时间**: 2024年12月
+- **变更内容**:
+  - **ESLint 配置统一化**:
+    - 删除了 `packages/eslint-config/base.js` 和 `packages/eslint-config/react-internal.js`
+    - 将 `packages/eslint-config/next.js` 作为统一配置，内联了原 base.js 的所有内容
+    - 添加了 `globals.browser` 支持，使配置同时适用于 Next.js 应用和 React 库
+    - 所有项目（根目录、Next.js 应用、React 库）统一使用 `@workspace/eslint-config/next-js`
+    - 更新了 `package.json` exports，只保留 `next-js` 导出
+  - **依赖清理**:
+    - 移除了 `@eslint/eslintrc` - 不再需要（使用 flat config 格式）
+    - 移除了 `@typescript-eslint/eslint-plugin` 和 `@typescript-eslint/parser` - 改用 `eslint-config-next/typescript`
+    - 移除了 `typescript-eslint` - 不再需要
+    - 移除了 `lucide-react` - 从未使用的依赖中清理
+    - 移除了 `zod` - 从未使用的依赖中清理
+  - **版本升级**:
+    - `next`: `^16.1.3` → `^16.1.4`
+    - `eslint-config-next`: `^16.1.3` → `^16.1.4`
+  - **其他变更**:
+    - `packages/typescript-config/react-library.json` - 添加了 `module: "ESNext"` 和 `moduleResolution: "Bundler"` 配置
+    - `apps/nextjs-template/tsconfig.json` - 移除了 `.next/types/**/*.ts` 的 include 配置
+- **变更原因**:
+  - 简化配置结构，减少维护成本
+  - `eslint-config-next` 已包含所有必要的 React 和 TypeScript 规则，无需单独配置
+  - 统一配置使所有项目使用相同的规则集，提高一致性
+  - 清理未使用的依赖，减少项目体积和潜在的依赖冲突
+
 #### ESLint 9.x Flat Config 迁移
 
-- **迁移时间**: 2024年
+- **迁移时间**: 2024年（已过时，现使用统一配置）
 - **变更内容**:
   - 将根目录的 `.eslintrc.js` 迁移到 `eslint.config.mjs`（flat config 格式）
   - 使用 ES modules 替代 CommonJS（`.mjs` 扩展名明确指定为 ES module）
   - 使用 flat config 数组格式替代旧的配置对象格式
   - 使用 `ignores` 字段替代 `ignorePatterns`
-  - 引用 `@workspace/eslint-config/base` 作为基础配置
+  - 引用 `@workspace/eslint-config/base` 作为基础配置（注：现已统一使用 `next-js` 配置）
 - **迁移原因**:
   - ESLint 9.x 默认使用 flat config 格式
   - 更好的性能和配置灵活性
@@ -298,15 +334,14 @@ pnpx add-skill vercel-labs/agent-skills
 #### 分类结构
 
 1. **核心框架** (Core Framework)
-   - `react@^19.2.3`, `react-dom@^19.2.3`, `next@^16.1.3`
+   - `react@^19.2.3`, `react-dom@^19.2.3`, `next@^16.1.4`
 
 2. **开发工具** (Development Tools)
    - `typescript@^5.9.3`, `eslint@^9.39.1`
-   - `@eslint/eslintrc@^3.3.1`, `@eslint/js@^9.39.1`
-   - `@typescript-eslint/eslint-plugin@^8.39.0`, `@typescript-eslint/parser@^8.39.0`
-   - `eslint-config-next@^16.1.3`, `eslint-config-prettier@^10.1.8`
+   - `@eslint/js@^9.39.1`
+   - `eslint-config-next@^16.1.4`, `eslint-config-prettier@^10.1.8`
    - `eslint-plugin-only-warn@^1.1.0`, `eslint-plugin-tailwindcss@^3.18.2`, `eslint-plugin-turbo@^2.5.5`
-   - `prettier-plugin-tailwindcss@^0.7.2`, `typescript-eslint@^8.39.0`
+   - `prettier-plugin-tailwindcss@^0.7.2`
    - `husky@^9.1.7`, `lint-staged@^16.2.7`
    - `@commitlint/cli@^20.3.1`, `@commitlint/config-conventional@^20.3.1`
    - `babel-plugin-react-compiler@^1.0.0`
@@ -315,7 +350,7 @@ pnpx add-skill vercel-labs/agent-skills
    - `@types/node@^20.19.25`, `@types/react@^19.2.7`, `@types/react-dom@^19.2.3`
 
 4. **UI 组件库** (UI Libraries)
-   - `@radix-ui/react-slot@^1.2.3`, `lucide-react@^0.475.0`, `next-themes@^0.4.6`
+   - `@radix-ui/react-slot@^1.2.3`, `next-themes@^0.4.6`
 
 5. **样式工具** (Styling Tools)
    - `tailwindcss@^3.4.17`, `autoprefixer@^10.4.20`, `tailwind-merge@^3.3.1`
@@ -324,7 +359,7 @@ pnpx add-skill vercel-labs/agent-skills
    - `turbo@^2.7.4`, `@turbo/gen@^2.5.5`, `prettier@^3.7.4`
 
 7. **工具库** (Utility Libraries)
-   - `zod@^3.25.76`, `class-variance-authority@^0.7.1`, `clsx@^2.1.1`
+   - `class-variance-authority@^0.7.1`, `clsx@^2.1.1`
    - `globals@^15.15.0`, `tw-animate-css@^1.3.6`
 
 所有依赖都通过 catalog 统一管理，确保版本一致性和易于维护。
@@ -350,10 +385,10 @@ pnpx add-skill vercel-labs/agent-skills
 ### 版本更新
 
 - **React**: 已更新到 `v19.2.3`(最新版本)
-- **Next.js**: 已更新到 `v16.1.3`(最新版本,支持 React Compiler)
+- **Next.js**: 已更新到 `v16.1.4`(最新版本,支持 React Compiler)
 - **Tailwind CSS**: 已从 `v4.x` 降级到 `v3.4.17`(更好的兼容性)
 - **Turbo**: 已从 `v2.6.3` 升级到 `v2.7.4`(使用 `@turbo/codemod` 自动升级,无需 codemod 迁移)
-- **ESLint Config**: `eslint-config-next` 升级到 `v16.1.3`, `eslint-config-prettier` 升级到 `v10.1.8`）
+- **ESLint Config**: `eslint-config-next` 升级到 `v16.1.4`, `eslint-config-prettier` 升级到 `v10.1.8`
 
 ### 添加新的依赖
 
@@ -407,7 +442,7 @@ Level 2 (应用层 - 应用):
 
 **示例**:
 
-- `@workspace/eslint-config`: 提供 ESLint 配置（base、next-js、react-internal）
+- `@workspace/eslint-config`: 提供统一的 ESLint 配置（next-js）
 - `@workspace/typescript-config`: 提供 TypeScript 配置（base、nextjs、react-library）
 
 **最佳实践**:
@@ -1299,7 +1334,7 @@ const Component = () => {
 ### 兼容性
 
 - **React 版本**: 需要 React 19+ (项目使用 `^19.2.3`)
-- **Next.js 版本**: 需要 Next.js 16+ (项目使用 `^16.1.3`)
+- **Next.js 版本**: 需要 Next.js 16+ (项目使用 `^16.1.4`)
 - **TypeScript**: 完全支持 TypeScript
 
 ### 最佳实践
