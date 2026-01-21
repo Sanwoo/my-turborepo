@@ -443,13 +443,72 @@ Level 2 (应用层 - 应用):
 **示例**:
 
 - `@workspace/eslint-config`: 提供统一的 ESLint 配置（next-js）
-- `@workspace/typescript-config`: 提供 TypeScript 配置（base、nextjs、react-library）
+- `@workspace/typescript-config`: 提供 TypeScript 配置（base、nextjs、react-library、typescript-library）
 
 **最佳实践**:
 
 - ✅ 配置包不应该有 `build` 脚本
 - ✅ 配置包应该只作为 `devDependencies`
 - ✅ Turborepo 会自动跳过没有 build 任务的包
+
+#### TypeScript 配置说明
+
+`@workspace/typescript-config` 提供了四种 TypeScript 配置，适用于不同的项目类型：
+
+1. **base.json** - 基础配置
+   - 包含通用的 TypeScript 设置（严格模式、类型检查等）
+   - 使用 `NodeNext` 模块系统
+   - 所有其他配置都继承此基础配置
+
+2. **nextjs.json** - Next.js 应用配置
+   - 继承 `base.json`
+   - 使用 `ESNext` 模块系统和 `Bundler` 模块解析
+   - 配置 `jsx: "preserve"`（Next.js 自己处理 JSX）
+   - 启用 `allowJs` 和 `noEmit`
+   - 包含 Next.js 插件
+
+3. **react-library.json** - React 组件库配置
+   - 继承 `base.json`
+   - 使用 `ESNext` 模块系统和 `Bundler` 模块解析
+   - 配置 `jsx: "react-jsx"`（编译时转换 JSX）
+   - 适用于包含 React 组件的共享库（如 `@workspace/ui`）
+
+4. **typescript-library.json** - 纯 TypeScript 库配置
+   - 继承 `base.json`
+   - 使用 `ESNext` 模块系统和 `Bundler` 模块解析
+   - 不包含 JSX 相关配置
+   - 适用于纯 TypeScript 共享包（如 hooks 共享包、工具函数库等）
+
+**使用示例**:
+
+Next.js 应用 (`apps/nextjs-template/tsconfig.json`):
+
+```json
+{
+  "extends": "@workspace/typescript-config/nextjs.json"
+}
+```
+
+React 组件库 (`packages/ui/tsconfig.json`):
+
+```json
+{
+  "extends": "@workspace/typescript-config/react-library.json"
+}
+```
+
+纯 TypeScript 库 (`packages/hooks/tsconfig.json`):
+
+```json
+{
+  "extends": "@workspace/typescript-config/typescript-library.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+```
 
 #### 2. 共享包 (Shared Packages)
 
