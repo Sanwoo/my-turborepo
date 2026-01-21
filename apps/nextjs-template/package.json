@@ -7,8 +7,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf .turbo .next dist node_modules"
   },
@@ -20,14 +20,8 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "catalog:",
-    "typescript": "catalog:",
-    "tailwindcss": "catalog:",
     "babel-plugin-react-compiler": "catalog:"
   }
 }

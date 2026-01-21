@@ -123,6 +123,25 @@ export default [
 
 子包配置（如 `packages/ui/eslint.config.js`）:
 
+对于 React 组件库，可能需要禁用 Next.js 特定的规则：
+
+```javascript
+import { nextJsConfig } from '@workspace/eslint-config/next-js'
+
+const config = [
+  ...nextJsConfig,
+  {
+    rules: {
+      '@next/next/no-html-link-for-pages': 'off',
+    },
+  },
+]
+
+export default config
+```
+
+对于 Next.js 应用，直接使用配置即可：
+
 ```javascript
 import { nextJsConfig } from '@workspace/eslint-config/next-js'
 
@@ -147,6 +166,33 @@ export default nextJsConfig
   - 提供 Tailwind CSS 最佳实践建议
 
 ### 变更历史
+
+#### 依赖管理优化与 ESLint 配置修复
+
+- **变更时间**: 2024年12月（最新）
+- **变更内容**:
+  - **依赖管理优化**:
+    - 将共享的 devDependencies 移到根目录 `package.json`：
+      - `@types/node`、`@types/react`、`@types/react-dom` - 类型定义
+      - `tailwindcss` - 样式工具
+      - `next` - 用于 `eslint-config-next` 的依赖解析
+    - 从子包中移除重复的共享依赖：
+      - `apps/nextjs-template`: 移除了共享的类型定义和工具
+      - `packages/ui`: 移除了共享的类型定义和工具
+    - 保留包特定的依赖：
+      - `apps/nextjs-template`: 保留 `babel-plugin-react-compiler`（Next.js 应用特定）
+      - `packages/ui`: 保留 `autoprefixer`、`tailwindcss-animate`（UI 包特定）
+  - **ESLint 配置修复**:
+    - `packages/ui/eslint.config.js`: 添加规则覆盖，禁用 `@next/next/no-html-link-for-pages`（组件库不需要 pages 目录）
+    - `apps/nextjs-template/package.json`: 将 lint 脚本从 `next lint` 改为 `eslint . --max-warnings 0`（更好的 flat config 支持）
+  - **Catalog 配置修复**:
+    - 修复了 `pnpm-workspace.yaml` 中 `@radix-ui/react-slot` 的递归引用问题
+    - 重新组织 catalog 条目，按字母顺序排列，提高可维护性
+- **变更原因**:
+  - 减少依赖重复，简化依赖管理
+  - 通过 pnpm 的依赖解析机制，所有子包可以访问根目录的共享依赖
+  - 修复 ESLint 配置问题，确保所有包都能正常进行 lint 检查
+  - 提高 catalog 配置的可读性和维护性
 
 #### ESLint 配置统一化与依赖清理
 
@@ -329,40 +375,78 @@ pnpx add-skill vercel-labs/agent-skills
 
 ### Catalog 配置
 
-项目在 `pnpm-workspace.yaml` 中使用 `catalog` 功能统一管理**所有依赖**的版本，按功能分类组织，结构清晰：
+项目在 `pnpm-workspace.yaml` 中使用 `catalog` 功能统一管理**所有依赖**的版本。Catalog 条目按**字母顺序**排列，便于查找和维护。
 
-#### 分类结构
+#### Catalog 条目（按字母顺序）
 
-1. **核心框架** (Core Framework)
-   - `react@^19.2.3`, `react-dom@^19.2.3`, `next@^16.1.4`
+所有依赖都在 `pnpm-workspace.yaml` 的 `catalog` 部分按字母顺序列出，包括：
 
-2. **开发工具** (Development Tools)
-   - `typescript@^5.9.3`, `eslint@^9.39.1`
-   - `@eslint/js@^9.39.1`
-   - `eslint-config-next@^16.1.4`, `eslint-config-prettier@^10.1.8`
-   - `eslint-plugin-only-warn@^1.1.0`, `eslint-plugin-tailwindcss@^3.18.2`, `eslint-plugin-turbo@^2.5.5`
-   - `prettier-plugin-tailwindcss@^0.7.2`
-   - `husky@^9.1.7`, `lint-staged@^16.2.7`
-   - `@commitlint/cli@^20.3.1`, `@commitlint/config-conventional@^20.3.1`
-   - `babel-plugin-react-compiler@^1.0.0`
+- **核心框架**: `next`、`react`、`react-dom`
+- **开发工具**: `eslint`、`typescript`、`turbo`、`prettier` 等
+- **类型定义**: `@types/node`、`@types/react`、`@types/react-dom`
+- **UI 组件库**: `@radix-ui/react-slot`、`next-themes`
+- **样式工具**: `tailwindcss`、`autoprefixer`、`tailwind-merge`、`tailwindcss-animate`
+- **构建工具**: `turbo`、`@turbo/gen`、`prettier`
+- **工具库**: `class-variance-authority`、`clsx`、`globals`
+- **ESLint 相关**: `@eslint/js`、`eslint-config-next`、`eslint-config-prettier`、`eslint-plugin-*`
+- **Git 工具**: `husky`、`lint-staged`、`@commitlint/*`
+- **其他**: `babel-plugin-react-compiler`
 
-3. **类型定义** (Type Definitions)
-   - `@types/node@^20.19.25`, `@types/react@^19.2.7`, `@types/react-dom@^19.2.3`
+**注意**: Catalog 条目按字母顺序排列，不再按功能分类，这样可以：
 
-4. **UI 组件库** (UI Libraries)
-   - `@radix-ui/react-slot@^1.2.3`, `next-themes@^0.4.6`
-
-5. **样式工具** (Styling Tools)
-   - `tailwindcss@^3.4.17`, `autoprefixer@^10.4.20`, `tailwind-merge@^2.6.0`
-
-6. **构建工具** (Build Tools)
-   - `turbo@^2.7.4`, `@turbo/gen@^2.5.5`, `prettier@^3.7.4`
-
-7. **工具库** (Utility Libraries)
-   - `class-variance-authority@^0.7.1`, `clsx@^2.1.1`
-   - `globals@^15.15.0`, `tailwindcss-animate@^1.0.7`
+- 快速查找依赖
+- 避免重复定义
+- 更容易维护和更新
 
 所有依赖都通过 catalog 统一管理，确保版本一致性和易于维护。
+
+### 共享依赖管理
+
+项目采用**分层依赖管理**策略，将共享的开发依赖放在根目录，包特定的依赖保留在各自包中。
+
+#### 根目录共享依赖
+
+以下 devDependencies 在根目录 `package.json` 中声明，所有子包都可以通过 pnpm 的依赖解析机制访问：
+
+- **类型定义**: `@types/node`、`@types/react`、`@types/react-dom`
+- **开发工具**: `eslint`、`typescript`、`prettier`、`turbo`
+- **样式工具**: `tailwindcss`
+- **特殊依赖**: `next`（`eslint-config-next` 需要它来解析 `next/babel`）
+- **Git 工具**: `husky`、`lint-staged`、`@commitlint/cli`、`@commitlint/config-conventional`
+
+#### 包特定依赖
+
+以下依赖保留在各自包的 `package.json` 中：
+
+- **apps/nextjs-template**:
+  - `babel-plugin-react-compiler` - Next.js 应用特定
+
+- **packages/ui**:
+  - `autoprefixer` - PostCSS 配置需要
+  - `tailwindcss-animate` - UI 包特定样式工具
+
+#### 依赖解析机制
+
+在 pnpm monorepo 中，依赖解析遵循以下顺序：
+
+```
+当前包目录 → 父目录 → ... → 根目录
+```
+
+当子包需要某个依赖时：
+
+1. 先检查自己的 `node_modules`
+2. 向上查找父目录的 `node_modules`
+3. 最终找到根目录的 `node_modules`
+
+因此，在根目录安装的共享依赖可以被所有子包访问，无需在每个子包中重复声明。
+
+#### 最佳实践
+
+- ✅ **放在根目录**: 跨包共享的开发工具（eslint、prettier、typescript、turbo 等）
+- ✅ **放在根目录**: 类型定义（如果多个包都使用）
+- ✅ **放在各自包中**: 包特定的构建工具和配置
+- ✅ **放在各自包中**: 运行时依赖（必须在各自的包中声明）
 
 ### 使用 Catalog
 
