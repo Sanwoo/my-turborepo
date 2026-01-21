@@ -353,14 +353,14 @@ pnpx add-skill vercel-labs/agent-skills
    - `@radix-ui/react-slot@^1.2.3`, `next-themes@^0.4.6`
 
 5. **样式工具** (Styling Tools)
-   - `tailwindcss@^3.4.17`, `autoprefixer@^10.4.20`, `tailwind-merge@^3.3.1`
+   - `tailwindcss@^3.4.17`, `autoprefixer@^10.4.20`, `tailwind-merge@^2.6.0`
 
 6. **构建工具** (Build Tools)
    - `turbo@^2.7.4`, `@turbo/gen@^2.5.5`, `prettier@^3.7.4`
 
 7. **工具库** (Utility Libraries)
    - `class-variance-authority@^0.7.1`, `clsx@^2.1.1`
-   - `globals@^15.15.0`, `tw-animate-css@^1.3.6`
+   - `globals@^15.15.0`, `tailwindcss-animate@^1.0.7`
 
 所有依赖都通过 catalog 统一管理，确保版本一致性和易于维护。
 
@@ -1190,17 +1190,16 @@ const config: Config = {
 
 **主要变更**:
 
-1. **导入顺序调整** (符合 CSS 规范):
-   - `@import` 规则必须放在所有规则之前（除了 `@charset` 和 `@layer`）
-   - 将 `@import 'tw-animate-css';` 移到 `@tailwind` 指令之前
+1. **动画库配置**:
+   - **v4**: 使用 `tw-animate-css`，通过 CSS `@import` 导入
+   - **v3**: 使用 `tailwindcss-animate`，作为 Tailwind 插件在 `tailwind.config.ts` 中配置，无需 CSS 导入
+   - 在 `tailwind.config.ts` 中添加：`import tailwindcssAnimate from 'tailwindcss-animate'` 并在 `plugins` 数组中包含 `tailwindcssAnimate`
 
 2. **导入方式**:
    - **v4**: `@import "tailwindcss";`
    - **v3**:
 
      ```css
-     @import 'tw-animate-css';
-
      @tailwind base;
      @tailwind components;
      @tailwind utilities;
@@ -1235,8 +1234,6 @@ const config: Config = {
 **最终结构**:
 
 ```css
-@import 'tw-animate-css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

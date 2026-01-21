@@ -88,17 +88,17 @@ catalogs:
       specifier: ^19.2.3
       version: 19.2.3
     tailwind-merge:
-      specifier: ^3.3.1
-      version: 3.3.1
+      specifier: ^2.6.0
+      version: 2.6.0
     tailwindcss:
       specifier: ^3.4.17
       version: 3.4.19
+    tailwindcss-animate:
+      specifier: ^1.0.7
+      version: 1.0.7
     turbo:
       specifier: ^2.7.4
       version: 2.7.4
-    tw-animate-css:
-      specifier: ^1.3.6
-      version: 1.3.6
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
@@ -238,10 +238,7 @@ importers:
         version: 19.2.3(react@19.2.3)
       tailwind-merge:
         specifier: 'catalog:'
-        version: 3.3.1
-      tw-animate-css:
-        specifier: 'catalog:'
-        version: 1.3.6
+        version: 2.6.0
     devDependencies:
       '@turbo/gen':
         specifier: 'catalog:'
@@ -270,6 +267,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.19(yaml@2.8.2)
+      tailwindcss-animate:
+        specifier: 'catalog:'
+        version: 1.0.7(tailwindcss@3.4.19(yaml@2.8.2))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -3051,8 +3051,13 @@ packages:
   swap-case@1.1.2:
     resolution: {integrity: sha512-BAmWG6/bx8syfc6qXPprof3Mn5vQgf5dwdUNJhsNqU9WdPt5P+ES/wQ5bxfijy8zwZgZZHslC3iAsxsuQMCzJQ==}
 
-  tailwind-merge@3.3.1:
-    resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
+  tailwind-merge@2.6.0:
+    resolution: {integrity: sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==}
+
+  tailwindcss-animate@1.0.7:
+    resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
 
   tailwindcss@3.4.19:
     resolution: {integrity: sha512-3ofp+LL8E+pK/JuPLPggVAIaEuhvIz4qNcf3nA1Xn2o/7fb7s/TYpHhwGDv1ZU3PkBluUVaF8PyCHcm48cKLWQ==}
@@ -3163,9 +3168,6 @@ packages:
   turbo@2.7.4:
     resolution: {integrity: sha512-bkO4AddmDishzJB2ze7aYYPaejMoJVfS0XnaR6RCdXFOY8JGJfQE+l9fKiV7uDPa5Ut44gmOWJL3894CIMeH9g==}
     hasBin: true
-
-  tw-animate-css@1.3.6:
-    resolution: {integrity: sha512-9dy0R9UsYEGmgf26L8UcHiLmSFTHa9+D7+dAt/G/sF5dCnPePZbfgDYinc7/UzAM7g/baVrmS6m9yEpU46d+LA==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -6421,7 +6423,11 @@ snapshots:
       lower-case: 1.1.4
       upper-case: 1.1.3
 
-  tailwind-merge@3.3.1: {}
+  tailwind-merge@2.6.0: {}
+
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.19(yaml@2.8.2)):
+    dependencies:
+      tailwindcss: 3.4.19(yaml@2.8.2)
 
   tailwindcss@3.4.19(yaml@2.8.2):
     dependencies:
@@ -6551,8 +6557,6 @@ snapshots:
       turbo-linux-arm64: 2.7.4
       turbo-windows-64: 2.7.4
       turbo-windows-arm64: 2.7.4
-
-  tw-animate-css@1.3.6: {}
 
   type-check@0.4.0:
     dependencies:

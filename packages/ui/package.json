@@ -12,8 +12,7 @@
     "clsx": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tailwind-merge": "catalog:",
-    "tw-animate-css": "catalog:"
+    "tailwind-merge": "catalog:"
   },
   "devDependencies": {
     "autoprefixer": "catalog:",
@@ -25,6 +24,7 @@
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
     "tailwindcss": "catalog:",
+    "tailwindcss-animate": "catalog:",
     "typescript": "catalog:"
   },
   "exports": {
