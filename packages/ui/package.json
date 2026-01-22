@@ -16,7 +16,6 @@
   },
   "devDependencies": {
     "autoprefixer": "catalog:",
-    "@turbo/gen": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "tailwindcss-animate": "catalog:"
