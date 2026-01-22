@@ -47,18 +47,17 @@ export const nextJsConfig = [
       'react/prop-types': 'off',
     },
   },
+  ...pluginTailwindcss.configs['flat/recommended'],
   {
-    plugins: {
-      tailwindcss: pluginTailwindcss,
-    },
+    files: ['**/*.{ts,tsx,js,jsx}'],
     settings: {
       tailwindcss: {
-        config: './tailwind.config.ts',
-        cssFiles: ['**/*.css', '!**/node_modules/**', '!**/dist/**', '!**/build/**'],
+        callees: ['cn', 'clsx', 'twMerge'],
       },
     },
     rules: {
-      ...pluginTailwindcss.configs.recommended.rules,
+      'tailwindcss/classnames-order': 'off',
+      'tailwindcss/no-custom-classname': 'off',
     },
   },
 ]
