@@ -3,12 +3,14 @@
 This template is for creating a monorepo with shadcn/ui.
 
 > [!IMPORTANT]
-> **兼容性说明**：本项目特意保持使用 **Tailwind CSS v3 (3.4.17)** 版本，以确保在旧版浏览器和遗留设备上的最佳兼容性。请勿在未评估兼容性影响的情况下升级到 v4。
+> **兼容性说明**：
+> 1. 本项目特意保持使用 **Tailwind CSS v3 (3.4.17)** 版本，以确保在旧版浏览器和遗留设备上的最佳兼容性。请勿在未评估兼容性影响的情况下升级到 v4。
+> 2. 由于使用的是 Tailwind v3，在添加 shadcn/ui 组件时，**请务必**使用 `shadcn@2.3.0`，而不是 `shadcn@latest`（后者默认支持 Tailwind v4）。
 
 ## Usage
 
 ```bash
-pnpm dlx shadcn@latest init
+pnpm dlx shadcn@2.3.0 init
 ```
 
 ## 快速创建新应用
@@ -45,7 +47,8 @@ pnpm dev
 To add components to your app, run the following command at the root of your `nextjs-template` app:
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/nextjs-template
+cd apps/nextjs-template
+pnpm dlx shadcn@2.3.0 add button
 ```
 
 This will place the ui components in the `packages/ui/src/components` directory.
