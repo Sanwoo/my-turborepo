@@ -4,6 +4,7 @@ This template is for creating a monorepo with shadcn/ui.
 
 > [!IMPORTANT]
 > **兼容性说明**：
+>
 > 1. 本项目特意保持使用 **Tailwind CSS v3 (3.4.17)** 版本，以确保在旧版浏览器和遗留设备上的最佳兼容性。请勿在未评估兼容性影响的情况下升级到 v4。
 > 2. 由于使用的是 Tailwind v3，在添加 shadcn/ui 组件时，**请务必**使用 `shadcn@2.3.0`，而不是 `shadcn@latest`（后者默认支持 Tailwind v4）。
 
@@ -214,8 +215,8 @@ export default nextJsConfig
     - 移除了 `lucide-react` - 从未使用的依赖中清理
     - 移除了 `zod` - 从未使用的依赖中清理
   - **版本升级**:
-    - `next`: `^16.1.3` → `^16.1.4`
-    - `eslint-config-next`: `^16.1.3` → `^16.1.4`
+    - `next`: `^16.1.4` → `^16.1.6`
+    - `eslint-config-next`: `^16.1.4` → `^16.1.6`
   - **其他变更**:
     - `packages/typescript-config/react-library.json` - 添加了 `module: "ESNext"` 和 `moduleResolution: "Bundler"` 配置
     - `apps/nextjs-template/tsconfig.json` - 移除了 `.next/types/**/*.ts` 的 include 配置
@@ -472,10 +473,10 @@ pnpx add-skill vercel-labs/agent-skills
 ### 版本更新
 
 - **React**: 已更新到 `v19.2.3`(最新版本)
-- **Next.js**: 已更新到 `v16.1.4`(最新版本,支持 React Compiler)
+- **Next.js**: 已更新到 `v16.1.6`(最新版本,支持 React Compiler)
 - **Tailwind CSS**: 已从 `v4.x` 降级到 `v3.4.17`(更好的兼容性)
 - **Turbo**: 已从 `v2.6.3` 升级到 `v2.7.4`(使用 `@turbo/codemod` 自动升级,无需 codemod 迁移)
-- **ESLint Config**: `eslint-config-next` 升级到 `v16.1.4`, `eslint-config-prettier` 升级到 `v10.1.8`
+- **ESLint Config**: `eslint-config-next` 升级到 `v16.1.6`, `eslint-config-prettier` 升级到 `v10.1.8`
 
 ### 添加新的依赖
 
@@ -1477,7 +1478,7 @@ const Component = () => {
 ### 兼容性
 
 - **React 版本**: 需要 React 19+ (项目使用 `^19.2.3`)
-- **Next.js 版本**: 需要 Next.js 16+ (项目使用 `^16.1.4`)
+- **Next.js 版本**: 需要 Next.js 16+ (项目使用 `^16.1.6`)
 - **TypeScript**: 完全支持 TypeScript
 
 ### 最佳实践
