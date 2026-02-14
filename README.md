@@ -388,7 +388,7 @@ pnpx add-skill vercel-labs/agent-skills
 - **核心框架**: `next`、`react`、`react-dom`
 - **开发工具**: `eslint`、`typescript`、`turbo`、`prettier` 等
 - **类型定义**: `@types/node`、`@types/react`、`@types/react-dom`
-- **UI 组件库**: `@radix-ui/react-slot`、`next-themes`
+- **UI 组件库**: `@radix-ui/react-slot`
 - **样式工具**: `tailwindcss`、`autoprefixer`、`tailwind-merge`、`tailwindcss-animate`
 - **构建工具**: `turbo`、`@turbo/gen`、`prettier`
 - **工具库**: `class-variance-authority`、`clsx`、`globals`
