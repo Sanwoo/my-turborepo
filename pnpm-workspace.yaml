@@ -8,7 +8,7 @@ catalog:
   '@commitlint/config-conventional': ^20.3.1
   '@eslint/js': ^9.39.1
   '@radix-ui/react-slot': ^1.2.3
-  '@turbo/gen': ^2.5.5
+  '@turbo/gen': ^2.9.12
   '@types/node': ^20.19.25
   '@types/react': ^19.2.7
   '@types/react-dom': ^19.2.3
@@ -17,23 +17,23 @@ catalog:
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
   eslint: ^9.39.1
-  eslint-config-next: ^16.1.6
+  eslint-config-next: ^16.2.6
   eslint-config-prettier: ^10.1.8
   eslint-plugin-only-warn: ^1.1.0
   eslint-plugin-tailwindcss: ^3.18.2
-  eslint-plugin-turbo: ^2.5.5
+  eslint-plugin-turbo: ^2.9.12
   globals: ^15.15.0
   husky: ^9.1.7
   lint-staged: ^16.2.7
-  next: ^16.1.6
+  next: ^16.2.6
   prettier: ^3.7.4
   prettier-plugin-tailwindcss: ^0.7.2
-  react: ^19.2.3
-  react-dom: ^19.2.3
+  react: ^19.2.6
+  react-dom: ^19.2.6
   tailwind-merge: ^2.6.0
   tailwindcss: ^3.4.17
   tailwindcss-animate: ^1.0.7
-  turbo: ^2.7.4
+  turbo: ^2.9.12
   typescript: ^5.9.3
 
 catalogMode: prefer
